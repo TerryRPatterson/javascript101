@@ -97,11 +97,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
     <script>
         
-        var body = document.querySelector('body');
-        var container = document.createElement('div');
-        var testDiv = document.createElement('div');
-        container.className='container';
-        // var container = document.querySelector('.container');
         var images = [
             {
                 src:'images/1.jpg',
@@ -139,73 +134,75 @@
                 alt:'Seven'
             }
         ];
-        var largeImageDiv = document.createElement('div');
-        var largeImage =  document.createElement('img');
-        var arrowLeft = document.createElement('a');
-        var arrowRight = document.createElement('a');
-        arrowLeft.textContent = '<';
-        arrowRight.textContent = '>';
-        arrowRight.setAttribute('href','#');
-        arrowLeft.setAttribute('href','#');
-        arrowLeft.className = 'arrow arrowLeft';
-        arrowRight.className = 'arrow arrowRight';
-        largeImageDiv.appendChild(arrowLeft);
-        largeImageDiv.appendChild(arrowRight);
-        largeImageDiv.className = 'largeImageDiv';
-        largeImageDiv.appendChild(largeImage);
-        container.appendChild(largeImageDiv);
-        largeImage.setAttribute('src',images[0].src);
+        var $body = $('body');
+        var $container = $('<div></div>').addClass('container');
+        $body.append($container);
         
-        var imgClick = function(e) {
-                this.classList.toggle('active');
-                largeImage.setAttribute('src',this.src);
-                largeImage.setAttribute('data-image-index', this.dataset.index);
-                largeImageDiv.classList.add('active');
+        var $largeImageDiv = $('<div></div>');
+        var $largeImage =  $('<img>');
+        var $arrowLeft = $('<a></a>');
+        var $arrowRight = $('<a></a>');
+        $arrowLeft.text('<');
+        $arrowRight.text('>');
+        $arrowRight.attr('href','#');
+        $arrowLeft.attr('href','#');
+        $arrowLeft.addClass( 'arrow arrowLeft');
+        $arrowRight.addClass( 'arrow arrowRight');
+        $largeImageDiv.append($arrowLeft);
+        $largeImageDiv.append($arrowRight);
+        $largeImageDiv.addClass('largeImageDiv');
+        $largeImageDiv.append($largeImage);
+        $container.append($largeImageDiv);
+        $largeImage.attr('src',images[0].src);
+        
+        var imgClick = function(event) {
+            var $this = $(this);
+            var currentIndex = $this.attr('data-image-index');
+                $largeImage.attr('src', images[currentIndex].src);
+                $largeImageDiv.attr('data-image-index', $this.attr('data-image-index'));
+                $largeImageDiv.addClass('active');
             };
-        var lgImgClick = function() {
-            largeImageDiv.classList.toggle('active');
+        var lgImgClick = function(event) {
+            
+            $largeImageDiv.toggleClass('active');
         }
-        var arrowClick = function(e) {
-            e.cancelBubble=true;
+        var arrowClick = function(event) {
+            var $this = $(this);
+            event.stopPropagation();
             var nextImg;
-            nextImg = largeImage.getAttribute('data-image-index');
-            if(e.target === arrowRight) {
+            nextImg = $largeImageDiv.attr('data-image-index'); // NOT WORKING
+            if($this.is($arrowRight)) {
                 nextImg ++;
-            } else {
+            } else if($this.is($arrowLeft)) {
                 nextImg --;
             }
-            console.log(nextImg);
             if(nextImg > images.length-1) {
                 nextImg = 0;
             }
             if(nextImg < 0 ) {
                 nextImg = images.length-1;
             }
-            largeImage.setAttribute('src', images[nextImg].src);
-            largeImage.setAttribute('data-image-index', nextImg);
+            $largeImage.attr('src', images[nextImg].src);
+            $largeImageDiv.attr('data-image-index', nextImg);
         }
-        largeImageDiv.addEventListener('click', lgImgClick);
-        arrowRight.addEventListener('click', arrowClick);
-        arrowLeft.addEventListener('click', arrowClick);
-        images.forEach(function(imageHolder, i, images) {
-            imageHolder = document.createElement('div');
-            var img = document.createElement('img');
-            var caption = document.createElement('span');
-            imageHolder.className = 'imageHolder';
-            container.appendChild(imageHolder);
-            imageHolder.appendChild(img);
-            imageHolder.appendChild(caption);
-            caption.className = 'caption';
-            caption.textContent = images[i].caption;
-            img.setAttribute('src', images[i].src);
-            img.dataset.index = i;
-            img.addEventListener('click', imgClick);
+        $largeImageDiv.on('click', lgImgClick);
+        $arrowRight.on('click', arrowClick);
+        $arrowLeft.on('click', arrowClick);
+
+        images.forEach(function(image, i, arr) {
+            var $imageHolder = $('<div></div>').addClass('imageHolder');
+            var $img = $('<img>');
+            var $caption = $('<span></span>');
+            $container.append($imageHolder);
+            $imageHolder.append($img);
+            $imageHolder.append($caption);
+            $caption.addClass('caption');
+            $caption.text(images[i].caption);
+            $img.attr('src', images[i].src);
+            $imageHolder.attr('data-image-index', i);
+            $imageHolder.on('click', imgClick);
         });
-        body.appendChild(container);
-
-    //     images.forEach(function(image, i, arr) {
-    // console.log(i + image + ' is part of ' + arr);
-
+        $body.append($container);
     
     </script>
 </body>
